@@ -1,4 +1,5 @@
 #include <vector>
+#include <string>
 #include <iostream>
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
@@ -7,8 +8,12 @@ int hsv_low[] = {30,100,100};
 int hsv_high[] = {90,255,255};
 //main method
 int main(int argc, char** argv){
+	int cam_port;
+	//default camera port is 0 (/dev/video0) if there is no argument
+	if (argc==1) cam_port = 0; 
+	else cam_port = std::stoi(argv[1]);
 	//camera input
-	cv::VideoCapture cap(0);
+	cv::VideoCapture cap(cam_port);
 	std::cout << "INITIALLIZING" << std::endl;
 	while(cap.isOpened()){
 		std::cout << "RUNNING" << std::endl;
