@@ -1,22 +1,29 @@
 #include <vector>
 #include <string>
 #include <iostream>
+#include <chrono>
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
 //hsv values
+//need to tune
 int hsv_low[] = {30,100,100};
 int hsv_high[] = {90,255,255};
 //main method
 int main(int argc, char** argv){
 	int cam_port;
-	//default camera port is 0 (/dev/video0) if there is no argument
+	//default camera port is 0 currently (/dev/video0) if there is no argument
 	if (argc==1) cam_port = 0; 
+	//otherwise the port is what is specified in the argument
 	else cam_port = std::stoi(argv[1]);
 	//camera input
 	cv::VideoCapture cap(cam_port);
 	std::cout << "INITIALLIZING" << std::endl;
+	//variables for calculating the dt (how many milliseconds each loop takes)
+	std::chrono::steady_clock::time_point start_timestamp, end_timestamp;
+	std::chrono::milliseconds dt;
 	while(cap.isOpened()){
-		std::cout << "RUNNING" << std::endl;
+		start_timestamp = std::chrono::steady_clock::now();
+		//get current timestamp
 		//3 image containers for camera feed, hsv, and filtered hsv
 		static cv::Mat raw_input;		
 		static cv::Mat hsv;		
@@ -31,8 +38,11 @@ int main(int argc, char** argv){
 		cv::imshow("camera input",raw_input);
 		cv::imshow("hsv filter", hsv);
 		cv::imshow("threshhold", threshhold);
-		
-		if (cv::waitKey(30)>=0) break;
+		end_timestamp = std::chrono::steady_clock::now();
+		//difference in time (end time - start time)
+		dt = std::chrono::duration_cast<std::chrono::milliseconds>(end_timestamp-start_timestamp);
+		std::cout << "RUNNING\tDT (ms): " << dt.count() << std::endl;
+		if (cv::waitKey(50)>=0) break;
 	}
 	std::cout << "DONE" << std::endl;
 	return 0;
