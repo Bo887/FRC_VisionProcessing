@@ -12,7 +12,7 @@ int main(int argc, char** argv){
 	int cam_port;
 	//default camera port is 1 currently (/dev/video1) if there is no argument
 	if (argc==1) cam_port = 1; 
-	//otherwise the port is what is specified in the argument
+	//otherwise the port is what is specified in the single argument
 	else cam_port = std::stoi(argv[1]);
 	//camera input
 	cv::VideoCapture cap(cam_port);
