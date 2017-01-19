@@ -25,21 +25,21 @@ int main(int argc, char** argv){
 		start_timestamp = std::chrono::steady_clock::now();
 		//get current timestamp
 		//3 image containers for camera feed, hsv, and filtered hsv
-		static cv::Mat raw_input;		
+		static cv::Mat frame;
 		static cv::Mat hsv;		
 		static cv::Mat mask;
 		//take in camera input into the first mat
-		raw_input = cv::imread("./TestImages/1ftH2ftD2Angle0Brightness.jpg",CV_LOAD_IMAGE_COLOR);//cap >> raw_input;
+		frame = cv::imread("./TestImages/1ftH4ftD0Angle0Brightness.jpg",CV_LOAD_IMAGE_COLOR);//cap >> frame;
 		//convert the raw feed into hsv and store in hsv mat
-		cv::cvtColor(raw_input,hsv,CV_RGB2HSV);	
+		cv::cvtColor(frame,hsv,CV_RGB2HSV);	
 		//filter the hsv for the hsv constants and store into the threshhold mat
 		cv::inRange(hsv,cv::Scalar(hsv_low[0],hsv_low[1],hsv_low[2]),cv::Scalar(hsv_high[0],hsv_high[1],hsv_high[2]),mask);
 		std::vector<std::vector<cv::Point> > contours;
 		cv::findContours(mask, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_TC89_KCOS);	
-		cv::drawContours(raw_input, contours, -1, (0,0,255), 3);
+		cv::drawContours(frame, contours, -1, (0,0,255), 3);
 		std:: cout << "Num of contours:\t" << contours.size() << std::endl;
 		//show the camera output	
-		cv::imshow("camera input",raw_input);
+		cv::imshow("frame", frame);
 		cv::imshow("hsv filter", hsv);
 		cv::imshow("mask", mask);
 		end_timestamp = std::chrono::steady_clock::now();
