@@ -2,7 +2,6 @@
 #include <string>
 #include <iostream>
 #include <chrono>
-#include <algorithm>
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
 //hsv values
