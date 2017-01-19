@@ -35,11 +35,14 @@ int main(int argc, char** argv){
 		cv::cvtColor(frame,hsv,CV_RGB2HSV);	
 		//filter the hsv for the hsv constants and store into the threshholded mask
 		cv::inRange(hsv,cv::Scalar(hsv_low[0],hsv_low[1],hsv_low[2]),cv::Scalar(hsv_high[0],hsv_high[1],hsv_high[2]),mask);
+		//vector to store the contours
 		std::vector<std::vector<cv::Point> > contours;
+		//find all the contours and store them in the vector
 		cv::findContours(mask, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_TC89_KCOS);	
-	//	cv::drawContours(frame, contours, -1, (0,0,255), 3);
+		//now we have to filter all the contours to find the largest two
 		double max_contour_index_1, max_contour_index_2;
 		double max_area = 0;
+		//find largest contour index (index is needed to display a specific contour later)
 		for(int i=0;i<contours.size();i++){
 			double area = cv::contourArea(contours[i], false);	
 			if (area > max_area){
@@ -47,6 +50,7 @@ int main(int argc, char** argv){
 				max_contour_index_1 = i;
 			}
 		}	
+		//reset variables and find largest contour that is not the previous one found
 		max_area = 0;
 		for(int i=0;i<contours.size();i++){
 			double area = cv::contourArea(contours[i], false);
@@ -55,13 +59,14 @@ int main(int argc, char** argv){
 				max_contour_index_2 = i;
 			}
 		}
+		//draw the two largest contours found using the contour indexces
 		cv::drawContours(frame, contours, max_contour_index_1, (0,0,255),4, 0);
 		cv::drawContours(frame, contours, max_contour_index_2, (0,0,255),4, 0);
-		std::cout << "Num of contours:\t" << contours.size() << std::endl;
 		//show the camera output	
 		cv::imshow("frame", frame);
 		cv::imshow("hsv filter", hsv);
 		cv::imshow("mask", mask);
+
 		end_timestamp = std::chrono::steady_clock::now();
 		//difference in time (end time - start time)
 		dt = std::chrono::duration_cast<std::chrono::milliseconds>(end_timestamp-start_timestamp);
