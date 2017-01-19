@@ -7,6 +7,12 @@
 //hsv values
 int hsv_low[] = {30,100,100};
 int hsv_high[] = {90,255,255};
+//method to get center coordinate of contour
+cv::Point get_center(std::vector<cv::Point> contour){
+	cv::Moments moment = cv::moments(contour, false);
+	cv::Point center = cv::Point(moment.m10/moment.m00, moment.m01/moment.m00);	
+	return center;
+}
 //main method
 int main(int argc, char** argv){
 	int cam_port;
@@ -61,6 +67,19 @@ int main(int argc, char** argv){
 		//draw the two largest contours found using the contour indexces
 		cv::drawContours(frame, contours, max_contour_index_1, (0,0,255),4, 0);
 		cv::drawContours(frame, contours, max_contour_index_2, (0,0,255),4, 0);
+		//find center of the two contours
+		cv::Point center_1, center_2;
+		center_1 = get_center(contours[max_contour_index_1]);
+		center_2 = get_center(contours[max_contour_index_2]);
+		//draw a circle on the two centers
+		cv::circle(frame, center_1, 3, (0,0,255), 2); 
+		cv::circle(frame, center_2, 3, (0,0,255), 2);
+		//find overall center of the two combined
+		cv::Point2f combined_center;
+		combined_center.x = (center_1.x+center_2.x)/2;
+		combined_center.y = (center_1.y+center_2.y)/2;
+		//draw a circle at the overall center
+		cv::circle(frame, combined_center, 3, (0,0,255), 2);
 		//show the camera output	
 		cv::imshow("frame", frame);
 		cv::imshow("hsv filter", hsv);
