@@ -2,6 +2,7 @@
 #include <string>
 #include <iostream>
 #include <chrono>
+#include <algorithm>
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
 //hsv values
@@ -32,12 +33,31 @@ int main(int argc, char** argv){
 		frame = cv::imread("./TestImages/1ftH4ftD0Angle0Brightness.jpg",CV_LOAD_IMAGE_COLOR);//cap >> frame;
 		//convert the raw feed into hsv and store in hsv mat
 		cv::cvtColor(frame,hsv,CV_RGB2HSV);	
-		//filter the hsv for the hsv constants and store into the threshhold mat
+		//filter the hsv for the hsv constants and store into the threshholded mask
 		cv::inRange(hsv,cv::Scalar(hsv_low[0],hsv_low[1],hsv_low[2]),cv::Scalar(hsv_high[0],hsv_high[1],hsv_high[2]),mask);
 		std::vector<std::vector<cv::Point> > contours;
 		cv::findContours(mask, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_TC89_KCOS);	
-		cv::drawContours(frame, contours, -1, (0,0,255), 3);
-		std:: cout << "Num of contours:\t" << contours.size() << std::endl;
+	//	cv::drawContours(frame, contours, -1, (0,0,255), 3);
+		double max_contour_index_1, max_contour_index_2;
+		double max_area = 0;
+		for(int i=0;i<contours.size();i++){
+			double area = cv::contourArea(contours[i], false);	
+			if (area > max_area){
+				max_area = area;
+				max_contour_index_1 = i;
+			}
+		}	
+		max_area = 0;
+		for(int i=0;i<contours.size();i++){
+			double area = cv::contourArea(contours[i], false);
+			if (area > max_area && i != max_contour_index_1){
+				max_area = area;
+				max_contour_index_2 = i;
+			}
+		}
+		cv::drawContours(frame, contours, max_contour_index_1, (0,0,255),4, 0);
+		cv::drawContours(frame, contours, max_contour_index_2, (0,0,255),4, 0);
+		std::cout << "Num of contours:\t" << contours.size() << std::endl;
 		//show the camera output	
 		cv::imshow("frame", frame);
 		cv::imshow("hsv filter", hsv);
